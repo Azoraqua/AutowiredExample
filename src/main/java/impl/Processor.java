@@ -22,6 +22,7 @@ public final class Processor {
                 for (Field field : scanResult.injects()) {
                     final boolean fieldAccessible = field.isAccessible();
                     field.setAccessible(true);
+
                     field.set((!Modifier.isStatic(field.getModifiers()) ? field.getDeclaringClass().newInstance() : null), value);
                     field.setAccessible(fieldAccessible);
                 }

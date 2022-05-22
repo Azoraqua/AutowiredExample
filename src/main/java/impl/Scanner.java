@@ -6,6 +6,7 @@ import api.Inject;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -13,14 +14,14 @@ public final class Scanner {
     public record ScanResult(boolean successful, Collection<Method> beans, Collection<Field> injects) {
     }
 
-    private final Set<Method> beans = new HashSet<>();
-    private final List<Field> injects = new ArrayList<>();
+    private Set<Method> beans = new HashSet<>();
+    private List<Field> injects = new ArrayList<>();
 
     public ScanResult scan() {
         // Scan entire classpath for Bean & Inject annotations.
 
         try {
-            final File workdir = new File(Objects.requireNonNull(RunnerImpl.class.getResource("/")).toURI());
+            final File workdir = new File(System.getenv("GRADLE_OPTS").contains("--cfg-workdir") ? Objects.requireNonNull(RunnerImpl.class.getResource("/")).toURI() : new URI("."));
 
             for (File file : searchFilesRecursively(workdir, new ArrayList<>())) {
                 final String path = file.getAbsolutePath();
@@ -45,6 +46,7 @@ public final class Scanner {
     private void scanBeans(Class<?> target) {
         // Search for beans.
         for (Method method : target.getDeclaredMethods()) {
+            final boolean accessible = method.isAccessible();
             method.setAccessible(true);
 
             if (!method.isAnnotationPresent(Bean.class)) {
@@ -52,13 +54,14 @@ public final class Scanner {
             }
 
             beans.add(method);
-            method.setAccessible(false);
+            method.setAccessible(accessible);
         }
     }
 
     private void scanInjects(Class<?> target) {
         // Search for injects.
         for (Field field : target.getDeclaredFields()) {
+            final boolean accessible = field.isAccessible();
             field.setAccessible(true);
 
             if (!field.isAnnotationPresent(Inject.class)) {
@@ -66,7 +69,7 @@ public final class Scanner {
             }
 
             injects.add(field);
-            field.setAccessible(false);
+            field.setAccessible(accessible);
         }
     }
 

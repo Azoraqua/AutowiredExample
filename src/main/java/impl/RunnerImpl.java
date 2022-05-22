@@ -13,4 +13,9 @@ public final class RunnerImpl implements Runner {
     public boolean process() {
         return false; // Implement processing.
     }
+
+    @Override
+    public void cleanup() {
+
+    }
 }

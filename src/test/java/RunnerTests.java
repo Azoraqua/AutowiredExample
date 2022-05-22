@@ -1,4 +1,5 @@
 import api.Runner;
+import impl.RunnerImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,7 +14,7 @@ public final class RunnerTests {
 
     @BeforeAll
     public static void setup() {
-//        runner = new RunnerImpl();
+        runner = new RunnerImpl();
     }
 
     @AfterAll

@@ -2,7 +2,6 @@ import api.Runner;
 import impl.RunnerImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Random;
@@ -16,6 +15,11 @@ public final class RunnerTests {
     @BeforeAll
     public static void setup() {
         runner = new RunnerImpl();
+    }
+
+    @AfterAll
+    public static void teardown() {
+        runner.cleanup();
     }
 
     @DisplayName("Test 1 - Scanning has successfully finished?")
@@ -36,16 +40,20 @@ public final class RunnerTests {
     @Order(3)
     @Test
     public void testRandomIsInitialized() {
-        Assertions.assertNotNull(Holder.random);
+        Assertions.assertNotNull(Injects.random);
     }
 
     @DisplayName("Test 4 - Random has correct type?")
     @Order(4)
     @Test
     public void testRandomIsCorrectType() {
-        final Random mocked = Mockito.mock(Holder.random.getClass());
-        Mockito.when(mocked.nextInt()).thenReturn(1);
+        Assertions.assertTrue(Random.class.isAssignableFrom(Injects.random.getClass()));
+    }
 
-        Assertions.assertEquals("The number is " + mocked.nextInt(), "The number is 1");
+    @DisplayName("Test 5 - Random functions correctly?")
+    @Order(5)
+    @Test
+    public void testRandomFunctionsCorrectly() {
+        Assertions.assertEquals(0, Injects.random.nextInt(1));
     }
 }

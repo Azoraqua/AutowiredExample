@@ -15,4 +15,6 @@ public interface Runner {
      * @return True if the designated fields are successfully injected otherwise false.
      */
     boolean process();
+
+    void cleanup();
 }

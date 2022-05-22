@@ -25,11 +25,7 @@ public final class RunnerImpl implements Runner {
 
     @Override
     public void cleanup() {
-<<<<<<< Updated upstream
-        // Implement cleanup.
-=======
         scanResult.beans().clear();
         scanResult.injects().clear();
->>>>>>> Stashed changes
     }
 }

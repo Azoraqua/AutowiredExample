@@ -14,15 +14,14 @@ public final class Scanner {
     public record ScanResult(boolean successful, Collection<Method> beans, Collection<Field> injects) {
     }
 
-    private Set<Method> beans = new HashSet<>();
-    private List<Field> injects = new ArrayList<>();
-
     public ScanResult scan() {
-        // Scan entire classpath for Bean & Inject annotations.
+        final Set<Method> beans = new HashSet<>();
+        final List<Field> injects = new ArrayList<>();
 
         try {
             final File workdir = new File(System.getenv("GRADLE_OPTS").contains("--cfg-workdir") ? Objects.requireNonNull(RunnerImpl.class.getResource("/")).toURI() : new URI("."));
 
+            // Scan entire classpath for Bean & Inject annotations.
             for (File file : searchFilesRecursively(workdir, new ArrayList<>())) {
                 final String path = file.getAbsolutePath();
 
@@ -32,8 +31,8 @@ public final class Scanner {
                             .replace(".class", "")
                             .substring(1));
 
-                    scanBeans(clazz);
-                    scanInjects(clazz);
+                    beans.addAll(scanBeans(clazz));
+                    injects.addAll(scanInjects(clazz));
                 }
             }
 
@@ -43,34 +42,42 @@ public final class Scanner {
         }
     }
 
-    private void scanBeans(Class<?> target) {
+    private Set<Method> scanBeans(Class<?> target) {
+        final Set<Method> beans = new HashSet<>();
+
         // Search for beans.
         for (Method method : target.getDeclaredMethods()) {
-            final boolean accessible = method.isAccessible();
-            method.setAccessible(true);
-
             if (!method.isAnnotationPresent(Bean.class)) {
                 continue;
             }
 
+            final boolean accessible = method.isAccessible();
+            method.setAccessible(true);
+
             beans.add(method);
             method.setAccessible(accessible);
         }
+
+        return beans;
     }
 
-    private void scanInjects(Class<?> target) {
+    private List<Field> scanInjects(Class<?> target) {
+        final List<Field> injects = new ArrayList<>();
+
         // Search for injects.
         for (Field field : target.getDeclaredFields()) {
-            final boolean accessible = field.isAccessible();
-            field.setAccessible(true);
-
             if (!field.isAnnotationPresent(Inject.class)) {
                 continue;
             }
 
+            final boolean accessible = field.isAccessible();
+            field.setAccessible(true);
+
             injects.add(field);
             field.setAccessible(accessible);
         }
+
+        return injects;
     }
 
     private List<File> searchFilesRecursively(File root, List<File> foundFiles) {

@@ -2,9 +2,6 @@ package impl;
 
 import api.Runner;
 
-import java.util.Collection;
-import java.util.Set;
-
 public final class RunnerImpl implements Runner {
 
     private Scanner.ScanResult scanResult; // Can be reused for a lower memory consumption.
@@ -28,8 +25,8 @@ public final class RunnerImpl implements Runner {
 
     @Override
     public void cleanup() {
-        for (Collection<?> c : Set.of(scanResult.beans(), scanResult.injects())) {
-            c.clear();
-        }
+        scanResult.beans().clear();
+        scanResult.injects().clear();
+        processResult.values().clear();
     }
 }

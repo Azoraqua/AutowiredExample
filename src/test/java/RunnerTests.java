@@ -41,6 +41,10 @@ public final class RunnerTests {
     @Test
     public void testRandomIsInitialized() {
         Assertions.assertNotNull(Injects.random);
+
+        System.out.println(Injects.random.hashCode());
+        System.out.println(Injects.random1.hashCode());
+        System.out.println(Injects.random2.hashCode());
     }
 
     @DisplayName("Test 4 - Random has correct type?")
